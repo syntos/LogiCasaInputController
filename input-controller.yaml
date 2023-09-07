@@ -1,0 +1,445 @@
+# These substitutions allow the end user to override certain values
+substitutions:
+  name: "inputcontroller"
+  friendly_name: "Input Controller"
+
+esphome:
+  name: "${name}"
+  # Friendly names are used where appropriate in Home Assistant
+  friendly_name: "${friendly_name}"
+  # Automatically add the mac address to the name
+  # so you can use a single firmware for all devices
+  name_add_mac_suffix: true
+
+  # This will allow for (future) project identification,
+  # configuration and updates.
+  project:
+    name: logicasa.input-controller
+    version: "1.0"
+
+
+esp32:
+  board: nodemcu-32s
+
+# To be able to get logs from the device via serial and api.
+logger:
+
+# API is a requirement of the dashboard import.
+api:
+
+# OTA is required for Over-the-Air updating
+ota:
+
+# This should point to the public location of this yaml file.
+dashboard_import:
+  package_import_url: github://syntos/LogiCasa/input-controller.yaml@main
+  import_full_config: false # or true
+
+wifi:
+  # Set up a wifi access point
+  ap:
+
+# In combination with the `ap` this allows the user
+# to provision wifi credentials to the device.
+captive_portal:
+
+# Sets up Bluetooth LE (Only on ESP32) to allow the user
+# to provision wifi credentials to the device.
+esp32_improv:
+  authorizer: none
+
+# Sets up the improv via serial client for Wi-Fi provisioning
+improv_serial:
+  next_url: https://www.logi.casa
+
+sensor:
+  - platform: wifi_signal # Reports the WiFi signal strength/RSSI in dB
+    name: "${name}_WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+  - platform: copy # Reports the WiFi signal strength in %
+    source_id: wifi_signal_db
+    name: "${name}_WiFi Signal"
+    id: wifi_signal_pct
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+
+i2c:
+  sda: 21
+  scl: 22
+  scan: True
+ 
+mcp23017:
+  - id: "mcp23017_hub1"
+    address: 0x20
+  - id: "mcp23017_hub2"
+    address: 0x24
+
+light:
+  - platform: status_led
+    name: "status led"
+    output: statusoutput
+  - platform: neopixelbus
+    variant: WS2812
+    pin: 5
+    num_leds: 1
+    name: "Status LED"
+    id: statusled
+    icon: "mdi:led-outline"
+    restore_mode: ALWAYS_ON
+    effects:
+      - pulse:
+
+output:
+  - platform: template
+    id: statusoutput
+    type: binary
+    write_action:
+      if:
+        condition:
+          wifi.connected:
+        then:
+          - light.turn_on: 
+              id: statusled
+              green: 0.0
+              red: 0.0
+              blue: 1.0              
+        else:
+          - light.turn_on: 
+              id: statusled
+              green: 0.0
+              red: 1.0
+              blue: 0.0              
+
+binary_sensor:
+  - platform: gpio
+    name: "${name}_INPUT_08"
+    id: ${name}_INPUT_08
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 0
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_07"
+    id: INPUT_07
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 1
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_06"
+    id: INPUT_06
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 2
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_05"
+    id: INPUT_05
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 3
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_01"
+    id: INPUT_01
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 4
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_02"
+    id: INPUT_02
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 5
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_03"
+    id: INPUT_03
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 6
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_04"
+    id: INPUT_04
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 7
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_20"
+    id: INPUT_20
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 8
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_19"
+    id: INPUT_19
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 9
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_18"
+    id: INPUT_18
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 10
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_17"
+    id: INPUT_17
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 11
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_21"
+    id: INPUT_21
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 12
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_22"
+    id: INPUT_22
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 13
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_23"
+    id: INPUT_23
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 14
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_24"
+    id: INPUT_24
+    pin:
+      mcp23xxx: mcp23017_hub1
+      number: 15
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_25"
+    id: INPUT_25
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 0
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_26"
+    id: INPUT_26
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 1
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_27"
+    id: INPUT_27
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 2
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_28"
+    id: INPUT_28
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 3
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_32"
+    id: INPUT_32
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 4
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_31"
+    id: INPUT_31
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 5
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_30"
+    id: INPUT_30
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 6
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_29"
+    id: INPUT_29
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 7
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_16"
+    id: INPUT_16
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 8
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_15"
+    id: INPUT_15
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 9
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_14"
+    id: INPUT_14
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 10
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_13"
+    id: INPUT_13
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 11
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_12"
+    id: INPUT_12
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 12
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_11"
+    id: INPUT_11
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 13
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_10"
+    id: INPUT_10
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 14
+      mode:
+        input: true
+        pullup: true
+      inverted: True
+  - platform: gpio
+    name: "${name}_INPUT_09"
+    id: INPUT_09
+    pin:
+      mcp23xxx: mcp23017_hub2
+      number: 15
+      mode:
+        input: true
+        pullup: true
+      inverted: True    
+button:
+  - platform: restart
+    name: "Reboot ${name}"
+    id: reboot
+
+  - platform: factory_reset
+    name: Restart with Factory Default Settings
