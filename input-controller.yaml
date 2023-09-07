@@ -118,7 +118,7 @@ output:
 binary_sensor:
   - platform: gpio
     name: "${name}_INPUT_08"
-    id: ${name}_INPUT_08
+    id: INPUT_08
     pin:
       mcp23xxx: mcp23017_hub1
       number: 0
